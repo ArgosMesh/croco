@@ -97,10 +97,9 @@ class Attention(nn.Module):
         qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).transpose(1,3)
         q, k, v = [qkv[:,:,i] for i in range(3)]
         # q,k,v = qkv.unbind(2)  # make torchscript happy (cannot use tensor as tuple)
-               
-        if self.rope is not None:
-            q = self.rope(q, xpos)
-            k = self.rope(k, xpos)
+        # if self.rope is not None:
+        q = self.rope(q, xpos)
+        k = self.rope(k, xpos)
                
         attn = (q @ k.transpose(-2, -1)) * self.scale
         attn = attn.softmax(dim=-1)
@@ -155,9 +154,9 @@ class CrossAttention(nn.Module):
         k = self.projk(key).reshape(B,Nk,self.num_heads, C// self.num_heads).permute(0, 2, 1, 3)
         v = self.projv(value).reshape(B,Nv,self.num_heads, C// self.num_heads).permute(0, 2, 1, 3)
         
-        if self.rope is not None:
-            q = self.rope(q, qpos)
-            k = self.rope(k, kpos)
+        # if self.rope is not None:
+        q = self.rope(q, qpos)
+        k = self.rope(k, kpos)
             
         attn = (q @ k.transpose(-2, -1)) * self.scale
         attn = attn.softmax(dim=-1)
